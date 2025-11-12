@@ -1,0 +1,30 @@
+# requirements.txt
+# Core dependencies for Primal-Dual Multi-Agent Off-Policy Actor-Critic
+
+# Deep Learning
+torch>=1.10.0
+torchvision>=0.11.0
+
+# Numerical Computing
+numpy>=1.19.0
+scipy>=1.6.0
+
+# Visualization
+matplotlib>=3.3.0
+seaborn>=0.11.0
+
+# Multi-Agent Environments
+gym>=0.21.0
+pettingzoo>=1.18.0
+
+# Optional: For StarCraft II
+pysc2>=3.0.0
+s2clientprotocol>=4.10.1.75800.0
+
+# Utilities
+tensorboard>=2.8.0  # For logging (optional)
+tqdm>=4.60.0  # For progress bars (optional)
+
+# ============================================================================
+# INSTALLATION INSTRUCTIONS
+# ============================================================================

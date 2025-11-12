@@ -1,0 +1,185 @@
+Quick Start Guide
+=================
+
+1. Setup Environment
+--------------------
+# Create virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Clone off-policy repository
+git clone https://github.com/marlbenchmark/off-policy.git
+cd off-policy
+git checkout release
+pip install -e .
+cd ..
+
+
+2. Basic Training
+-----------------
+# Train on MPE Simple Spread
+python train.py --env_name mpe_simple_spread --num_agents 3 --num_episodes 10000
+
+# Monitor with TensorBoard (optional)
+tensorboard --logdir ./saved_models
+
+
+3. Evaluation
+-------------
+# Evaluate trained model
+python evaluate.py \
+    --env_name mpe_simple_spread \
+    --model_path ./saved_models/simple_spread/model_final.pt \
+    --num_eval_episodes 100 \
+    --deterministic
+
+
+4. Visualization
+----------------
+# Plot training curves
+python plot_results.py \
+    --mode training \
+    --metrics_path ./saved_models/simple_spread/metrics.json
+
+
+5. For StarCraft II
+--------------------
+# Install StarCraft II
+bash install_sc2.sh
+
+# Set environment variable
+export SC2PATH=~/StarCraftII
+
+# Train on SMAC
+python train.py --env_name smac_3m --use_conv --cuda
+
+
+File Structure
+==============
+Your project should look like:
+
+primal_dual_marl/
+├── off-policy/              # Cloned repository
+│   ├── offpolicy/
+│   │   ├── envs/
+│   │   │   ├── mpe/
+│   │   │   └── starcraft2/
+│   │   └── ...
+│   └── ...
+├── networks.py              # Network architectures
+├── algorithm.py             # Algorithm implementation
+├── train.py                 # Training script
+├── evaluate.py              # Evaluation script
+├── plot_results.py          # Plotting utilities
+├── requirements.txt         # This file
+├── example_runs.sh          # Example experiments
+└── saved_models/            # Saved checkpoints
+    ├── simple_spread/
+    │   ├── model_final.pt
+    │   └── metrics.json
+    └── ...
+
+
+Troubleshooting
+===============
+
+Issue: ImportError for offpolicy
+Solution: Add to PYTHONPATH
+    export PYTHONPATH="${PYTHONPATH}:$(pwd)/off-policy"
+
+Issue: CUDA out of memory
+Solution: Reduce hidden dimension
+    --hidden_dim 32
+
+Issue: Slow convergence
+Solution: Tune hyperparameters
+    --lr_critic 5e-4 --beta 0.05
+
+Issue: StarCraft II not found
+Solution: Install and set path
+    bash install_sc2.sh
+    export SC2PATH=~/StarCraftII
+
+
+Key Hyperparameters
+===================
+
+Learning Rates:
+- lr_actor: 1e-3 (MPE), 5e-4 (SMAC)
+- lr_critic: 1e-3 (MPE), 5e-4 (SMAC)
+- lr_dual: 1e-3 (MPE), 5e-4 (SMAC)
+
+Consensus:
+- beta: 0.1 (MPE), 0.05 (SMAC)
+  Higher beta = stronger consensus enforcement
+  Lower beta = more flexibility
+
+Network:
+- hidden_dim: 64 (MPE), 128 (SMAC)
+- use_conv: False (MPE), True (SMAC)
+
+Training:
+- gamma: 0.99 (standard discount)
+- max_episode_length: 100 (MPE), 200-300 (SMAC)
+
+
+Expected Performance
+====================
+
+MPE Simple Spread (3 agents):
+- Initial reward: ~ -150
+- Converged reward: > -50
+- Training time: ~5k episodes
+- Consensus error: < 0.01
+
+MPE Simple Reference (2 agents):
+- Initial reward: ~ -100
+- Converged reward: > -30
+- Training time: ~10k episodes
+- Consensus error: < 0.01
+
+SMAC 3m:
+- Initial win rate: 0%
+- Converged win rate: > 80%
+- Training time: ~15k episodes
+- Consensus error: < 0.05
+
+SMAC 2s3z:
+- Initial win rate: 0%
+- Converged win rate: > 60%
+- Training time: ~25k episodes
+- Consensus error: < 0.05
+
+
+Common Commands
+===============
+
+# Quick test run (100 episodes)
+python train.py --env_name mpe_simple_spread --num_episodes 100
+
+# Full training with GPU
+python train.py --env_name mpe_simple_spread --num_episodes 10000 --cuda
+
+# Resume training
+python train.py --env_name mpe_simple_spread --resume --model_path ./saved_models/model_5000.pt
+
+# Evaluate with rendering
+python evaluate.py --env_name mpe_simple_spread --model_path ./saved_models/model_final.pt --render
+
+# Compare multiple runs
+python plot_results.py --mode comparison \
+    --comparison_paths run1/metrics.json run2/metrics.json \
+    --comparison_labels "Run 1" "Run 2"
+
+
+Contact & Support
+=================
+
+For issues and questions:
+- Check the README.md
+- Review the algorithm paper
+- Open an issue on GitHub
+
